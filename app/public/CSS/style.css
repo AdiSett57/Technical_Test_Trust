@@ -1,0 +1,36 @@
+.nav-link{
+    font-size: 16px;
+    font-weight: normal;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 1px;
+}
+
+h1{
+    font-family: 'Times New Roman', Times, serif;
+}
+
+table.tabel-jadwal tbody tr.th-poli{
+    background-color: #C9DAF8;
+}
+
+table.tabel-jadwal thead tr.master-th{
+    background-color: #0B5394;
+    color: #ffffff;
+    font-size: larger;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+table.tabel-jadwal thead tr.tb-header{
+    background-color: #052e55;
+    color: #ffffff;
+    height: 60px;
+    text-align: center;
+}
+
+table.tabel-jadwal thead tr.tb-header th{
+    padding: 20px 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    font-size: x-large;
+}
