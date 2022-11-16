@@ -2,10 +2,10 @@
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Aug 02, 2021 at 07:28 PM
--- Server version: 10.4.11-MariaDB
--- PHP Version: 7.3.18
+-- Host: 127.0.0.1:3306
+-- Generation Time: Nov 16, 2022 at 12:10 PM
+-- Server version: 5.7.31
+-- PHP Version: 7.4.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,13 +27,18 @@ SET time_zone = "+00:00";
 -- Table structure for table `diagnosa_pasien`
 --
 
-CREATE TABLE `diagnosa_pasien` (
-`diagnosapasien_id` int(11) NOT NULL,
-`kunjungan_id` int(11) DEFAULT NULL,
-`m_dokter_id` int(255) DEFAULT NULL,
-`m_diagnosa_id` int(11) DEFAULT NULL,
-`diagnosapasien_jenis` varchar(255) DEFAULT NULL COMMENT 'UTAMA , SEKUNDER',
-`diagnosapasien_kasus` varchar(255) DEFAULT NULL COMMENT 'LAMA ,BARU'
+DROP TABLE IF EXISTS `diagnosa_pasien`;
+CREATE TABLE IF NOT EXISTS `diagnosa_pasien` (
+  `diagnosapasien_id` int(11) NOT NULL,
+  `kunjungan_id` int(11) DEFAULT NULL,
+  `m_dokter_id` int(255) DEFAULT NULL,
+  `m_diagnosa_id` int(11) DEFAULT NULL,
+  `diagnosapasien_jenis` varchar(255) DEFAULT NULL COMMENT 'UTAMA , SEKUNDER',
+  `diagnosapasien_kasus` varchar(255) DEFAULT NULL COMMENT 'LAMA ,BARU',
+  PRIMARY KEY (`diagnosapasien_id`),
+  KEY `diagnosa_kunjungan_id` (`kunjungan_id`),
+  KEY `m_diagnosa_id` (`m_diagnosa_id`),
+  KEY `dokter` (`m_dokter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -148,15 +153,21 @@ INSERT INTO `diagnosa_pasien` (`diagnosapasien_id`, `kunjungan_id`, `m_dokter_id
 -- Table structure for table `kunjungan_pasien`
 --
 
-CREATE TABLE `kunjungan_pasien` (
-`pendaftaran_id` int(11) NOT NULL,
-`pendaftran_no` varchar(50) DEFAULT NULL,
-`m_pasien_id` int(11) DEFAULT NULL,
-`m_unit_id` int(11) DEFAULT NULL,
-`m_bayar_id` int(11) DEFAULT NULL,
-`daftar_tanggal` timestamp(6) NULL DEFAULT NULL,
-`pulang_tanggal` timestamp(6) NULL DEFAULT NULL,
-`m_dokter_id` int(11) DEFAULT NULL
+DROP TABLE IF EXISTS `kunjungan_pasien`;
+CREATE TABLE IF NOT EXISTS `kunjungan_pasien` (
+  `pendaftaran_id` int(11) NOT NULL,
+  `pendaftran_no` varchar(50) DEFAULT NULL,
+  `m_pasien_id` int(11) DEFAULT NULL,
+  `m_unit_id` int(11) DEFAULT NULL,
+  `m_bayar_id` int(11) DEFAULT NULL,
+  `daftar_tanggal` timestamp(6) NULL DEFAULT NULL,
+  `pulang_tanggal` timestamp(6) NULL DEFAULT NULL,
+  `m_dokter_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`pendaftaran_id`),
+  KEY `pasien_id` (`m_pasien_id`),
+  KEY `bayar_id` (`m_bayar_id`),
+  KEY `unit_id` (`m_unit_id`),
+  KEY `dokter_id` (`m_dokter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -271,10 +282,12 @@ INSERT INTO `kunjungan_pasien` (`pendaftaran_id`, `pendaftran_no`, `m_pasien_id`
 -- Table structure for table `master_diagnosa`
 --
 
-CREATE TABLE `master_diagnosa` (
-`diagnosa_id` int(11) NOT NULL,
-`diagnosa_kode` varchar(255) DEFAULT NULL,
-`diagnosa_name` varchar(255) DEFAULT NULL
+DROP TABLE IF EXISTS `master_diagnosa`;
+CREATE TABLE IF NOT EXISTS `master_diagnosa` (
+  `diagnosa_id` int(11) NOT NULL,
+  `diagnosa_kode` varchar(255) DEFAULT NULL,
+  `diagnosa_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`diagnosa_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -296,27 +309,63 @@ INSERT INTO `master_diagnosa` (`diagnosa_id`, `diagnosa_kode`, `diagnosa_name`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `master_dokter`
+-- Table structure for table `master_dokters`
 --
 
-CREATE TABLE `master_dokter` (
-`pegawai_id` int(11) NOT NULL,
-`pegawai_nomor` varchar(255) DEFAULT NULL,
-`pegawai_nama` varchar(255) DEFAULT NULL,
-`pegawai_jenis_kelamin` char(255) DEFAULT NULL COMMENT 'L=laki-laki , P=perempuan',
-`pegawai_sip` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+DROP TABLE IF EXISTS `master_dokters`;
+CREATE TABLE IF NOT EXISTS `master_dokters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pegawai_nomor` varchar(255) DEFAULT NULL,
+  `pegawai_nama` varchar(255) DEFAULT NULL,
+  `pegawai_jenis_kelamin` char(255) DEFAULT NULL COMMENT 'L=laki-laki , P=perempuan',
+  `pegawai_sip` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `master_dokter`
+-- Dumping data for table `master_dokters`
 --
 
-INSERT INTO `master_dokter` (`pegawai_id`, `pegawai_nomor`, `pegawai_nama`, `pegawai_jenis_kelamin`, `pegawai_sip`) VALUES
+INSERT INTO `master_dokters` (`id`, `pegawai_nomor`, `pegawai_nama`, `pegawai_jenis_kelamin`, `pegawai_sip`) VALUES
 (1, '0001', 'Dr Nagita silvana', 'P', '12345678912345'),
 (2, '0002', 'Dr Tiger Wang', 'L', '98765432199999'),
 (3, '0003', 'Dr Muslim Irham', 'L', '43214321678967'),
-(4, '0004', 'Dr Coki Hotaliha', 'L', '65489032155590'),
-(5, '0005', 'Dr Luna Miya', 'P', '43522004213455');
+(5, '0005', 'Dr Luna Miya', 'P', '43522004213455'),
+(11, '0008', 'Isyana suprapto', 'P', '111111111112'),
+(12, '0009', 'Adi Setiawan', 'L', '111111111114');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `master_jadwals`
+--
+
+DROP TABLE IF EXISTS `master_jadwals`;
+CREATE TABLE IF NOT EXISTS `master_jadwals` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `master_dokter_id` char(11) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `master_unit_id` char(11) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `senin` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `selasa` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rabu` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `kamis` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `jumat` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sabtu` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `minggu` varchar(14) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `master_jadwals`
+--
+
+INSERT INTO `master_jadwals` (`id`, `master_dokter_id`, `master_unit_id`, `senin`, `selasa`, `rabu`, `kamis`, `jumat`, `sabtu`, `minggu`, `created_at`, `updated_at`) VALUES
+(11, '3', '10', NULL, '12.00 - 17.00', NULL, '12.00 - 17.00', '12.00 - 17.00', NULL, '12.00 - 17.00', '2022-11-16 02:47:50', '2022-11-16 02:47:50'),
+(10, '11', '5', NULL, '12.00 - 17.00', NULL, '12.00 - 17.00', NULL, '12.00 - 17.00', '12.00 - 17.00', '2022-11-16 02:47:14', '2022-11-16 02:47:14'),
+(9, '2', '1', '08.00 - 10.00', NULL, NULL, '08.00 - 10.00', NULL, NULL, NULL, '2022-11-16 02:46:48', '2022-11-16 02:46:48'),
+(8, '1', '4', NULL, '08.00 - 10.00', '08.00 - 10.00', NULL, NULL, NULL, NULL, '2022-11-16 02:46:24', '2022-11-16 02:46:24');
 
 -- --------------------------------------------------------
 
@@ -324,14 +373,16 @@ INSERT INTO `master_dokter` (`pegawai_id`, `pegawai_nomor`, `pegawai_nama`, `peg
 -- Table structure for table `master_pasien`
 --
 
-CREATE TABLE `master_pasien` (
-`pasien_id` int(11) NOT NULL,
-`pasien_norm` varchar(10) DEFAULT NULL,
-`pasien_nik` varchar(20) DEFAULT NULL,
-`pasien_nama` varchar(255) DEFAULT NULL,
-`pasien_kelamin` char(255) DEFAULT NULL COMMENT 'L = laki-laki , P= Perempuan',
-`pasien_alamat` text DEFAULT NULL,
-`pasien_kota` varchar(255) DEFAULT NULL
+DROP TABLE IF EXISTS `master_pasien`;
+CREATE TABLE IF NOT EXISTS `master_pasien` (
+  `pasien_id` int(11) NOT NULL,
+  `pasien_norm` varchar(10) DEFAULT NULL,
+  `pasien_nik` varchar(20) DEFAULT NULL,
+  `pasien_nama` varchar(255) DEFAULT NULL,
+  `pasien_kelamin` char(255) DEFAULT NULL COMMENT 'L = laki-laki , P= Perempuan',
+  `pasien_alamat` text,
+  `pasien_kota` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`pasien_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -352,10 +403,12 @@ INSERT INTO `master_pasien` (`pasien_id`, `pasien_norm`, `pasien_nik`, `pasien_n
 -- Table structure for table `master_pembayaran`
 --
 
-CREATE TABLE `master_pembayaran` (
-`bayar_id` int(11) NOT NULL,
-`bayar_kode` varchar(255) DEFAULT NULL,
-`bayar_nama` varchar(255) DEFAULT NULL
+DROP TABLE IF EXISTS `master_pembayaran`;
+CREATE TABLE IF NOT EXISTS `master_pembayaran` (
+  `bayar_id` int(11) NOT NULL,
+  `bayar_kode` varchar(255) DEFAULT NULL,
+  `bayar_nama` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`bayar_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -371,95 +424,91 @@ INSERT INTO `master_pembayaran` (`bayar_id`, `bayar_kode`, `bayar_nama`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `master_unit`
+-- Table structure for table `master_units`
 --
 
-CREATE TABLE `master_unit` (
-`unit_id` int(11) NOT NULL,
-`unit_kode` varchar(255) DEFAULT NULL,
-`unit_nama` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+DROP TABLE IF EXISTS `master_units`;
+CREATE TABLE IF NOT EXISTS `master_units` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `unit_kode` varchar(255) DEFAULT NULL,
+  `unit_nama` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `master_unit`
+-- Dumping data for table `master_units`
 --
 
-INSERT INTO `master_unit` (`unit_id`, `unit_kode`, `unit_nama`) VALUES
+INSERT INTO `master_units` (`id`, `unit_kode`, `unit_nama`) VALUES
 (1, 'MAT', 'POLI MATA'),
 (2, 'JTG', 'POLI JANTUNG'),
 (3, 'GJL', 'POLI GINJAL'),
 (4, 'GIGI', 'POLI GIGI'),
-(5, 'KAND', 'POLI KANDUNGAN');
+(5, 'KAND', 'POLI KANDUNGAN'),
+(10, 'SARF', 'POLI SARAF');
 
 -- --------------------------------------------------------
 
 --
--- Indexes for table `diagnosa_pasien`
+-- Table structure for table `migrations`
 --
-ALTER TABLE `diagnosa_pasien`
-ADD PRIMARY KEY (`diagnosapasien_id`),
-ADD KEY `diagnosa_kunjungan_id` (`kunjungan_id`),
-ADD KEY `m_diagnosa_id` (`m_diagnosa_id`),
-ADD KEY `dokter` (`m_dokter_id`);
+
+DROP TABLE IF EXISTS `migrations`;
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Indexes for table `kunjungan_pasien`
+-- Dumping data for table `migrations`
 --
-ALTER TABLE `kunjungan_pasien`
-ADD PRIMARY KEY (`pendaftaran_id`),
-ADD KEY `pasien_id` (`m_pasien_id`),
-ADD KEY `bayar_id` (`m_bayar_id`),
-ADD KEY `unit_id` (`m_unit_id`),
-ADD KEY `dokter_id` (`m_dokter_id`);
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(1, '2019_12_14_000001_create_personal_access_tokens_table', 1),
+(2, '2022_11_15_073038_create_master_jadwals_table', 1);
+
+-- --------------------------------------------------------
 
 --
--- Indexes for table `master_diagnosa`
+-- Table structure for table `personal_access_tokens`
 --
-ALTER TABLE `master_diagnosa`
-ADD PRIMARY KEY (`diagnosa_id`) USING BTREE;
+
+DROP TABLE IF EXISTS `personal_access_tokens`;
+CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Indexes for table `master_dokter`
+-- Constraints for dumped tables
 --
-ALTER TABLE `master_dokter`
-ADD PRIMARY KEY (`pegawai_id`);
-
---
--- Indexes for table `master_pasien`
---
-ALTER TABLE `master_pasien`
-ADD PRIMARY KEY (`pasien_id`);
-
---
--- Indexes for table `master_pembayaran`
---
-ALTER TABLE `master_pembayaran`
-ADD PRIMARY KEY (`bayar_id`);
-
---
--- Indexes for table `master_unit`
---
-ALTER TABLE `master_unit`
-ADD PRIMARY KEY (`unit_id`);
 
 --
 -- Constraints for table `diagnosa_pasien`
 --
 ALTER TABLE `diagnosa_pasien`
-ADD CONSTRAINT `diagnosa_kunjungan_id` FOREIGN KEY (`kunjungan_id`) REFERENCES `kunjungan_pasien` (`pendaftaran_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `dokter` FOREIGN KEY (`m_dokter_id`) REFERENCES `master_dokter` (`pegawai_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `m_diagnosa_id` FOREIGN KEY (`m_diagnosa_id`) REFERENCES `master_diagnosa` (`diagnosa_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `diagnosa_kunjungan_id` FOREIGN KEY (`kunjungan_id`) REFERENCES `kunjungan_pasien` (`pendaftaran_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `m_diagnosa_id` FOREIGN KEY (`m_diagnosa_id`) REFERENCES `master_diagnosa` (`diagnosa_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `kunjungan_pasien`
 --
 ALTER TABLE `kunjungan_pasien`
-ADD CONSTRAINT `bayar_id` FOREIGN KEY (`m_bayar_id`) REFERENCES `master_pembayaran` (`bayar_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `dokter_id` FOREIGN KEY (`m_dokter_id`) REFERENCES `master_dokter` (`pegawai_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `pasien_id` FOREIGN KEY (`m_pasien_id`) REFERENCES `master_pasien` (`pasien_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `unit_id` FOREIGN KEY (`m_unit_id`) REFERENCES `master_unit` (`unit_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
+  ADD CONSTRAINT `bayar_id` FOREIGN KEY (`m_bayar_id`) REFERENCES `master_pembayaran` (`bayar_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pasien_id` FOREIGN KEY (`m_pasien_id`) REFERENCES `master_pasien` (`pasien_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
